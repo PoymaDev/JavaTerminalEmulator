@@ -15,6 +15,11 @@ import javax.swing.JTextField;
 
 
 public class Main {
+    private static String vfsPath = "";
+    private static String script = "";
+    private static ArrayList<String> vfsFiles = new ArrayList();
+    private static String currentPath = "/";
+
 
     public static JFrame createWindow() {
         String user = System.getProperty("user.name");
@@ -55,11 +60,11 @@ public class Main {
     }
 
     public static void ls(ArrayList<String> tokens, JTextArea textArea) {
-        textArea.append("Выполнена команда ls. Аргументы " + tokens.toString());
+        textArea.append("Выполнена команда ls. Аргументы " + tokens.toString() + "\n");
     }
 
     public static void cd(ArrayList<String> tokens, JTextArea textArea) {
-        textArea.append("Выполнена команда cd. Аргументы " + tokens.toString());
+        textArea.append("Выполнена команда cd. Аргументы " + tokens.toString() + "\n");
     }
 
     public ArrayList<String> cdParser(String input) {
@@ -96,6 +101,10 @@ public class Main {
                 case "cd":
                     cd(tokens, textArea);
                     break;
+                case "conf-dump":
+                    textArea.append("vfs-path = " + vfsPath + "\n");
+                    textArea.append("script = " + script + "\n");
+                    break;
                 default:
                     textArea.append(" Такой команды не существует\n");
             }
@@ -103,9 +112,47 @@ public class Main {
         }
     }
 
+    private static void executeStartScript(String script, JTextArea textArea) {
+        if (!script.isEmpty()) {
+            if (script.endsWith(".txt")) {
+                try {
+                    File file = new File(script);
+                    Scanner fileScanner = new Scanner(file);
+
+                    while(fileScanner.hasNextLine()) {
+                        String cmd = fileScanner.nextLine().trim();
+                        if (!cmd.isEmpty() && !cmd.startsWith("//")) {
+                            executeCommand(cmd, textArea);
+                        }
+                    }
+
+                    fileScanner.close();
+                } catch (Exception var7) {
+                }
+            } else {
+                String[] commands = script.split(";");
+
+                for(String cmd : commands) {
+                    cmd = cmd.trim();
+                    if (!cmd.isEmpty() && !cmd.startsWith("//")) {
+                        executeCommand(cmd, textArea);
+                    }
+                }
+            }
+        }
+
+    }
 
 
-    static void main() {
+    public static void main(String[] args) {
+        if (args.length > 0) {
+            vfsPath = args[0];
+        }
+
+        if (args.length > 1) {
+            script = args[1];
+        }
+
         JFrame window = createWindow();
         JTextArea textArea = createTextArea();
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -118,9 +165,10 @@ public class Main {
             if (!vvod.isEmpty()) {
                 executeCommand(vvod, textArea);
             }
-
             inputField.setText("");
         });
 
+
+        executeStartScript(script, textArea);
     }
 }
