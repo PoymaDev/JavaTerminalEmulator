@@ -1,0 +1,17 @@
+# Файлы компиляции и сборки Java
+*.class
+**/*.class
+/out/
+/target/
+/build/
+
+# Настройки среды разработки (IntelliJ IDEA, Eclipse, NetBeans)
+.idea/
+*.iml
+*.iws
+.settings/
+.classpath
+.project
+
+# Системные файлы Mac
+.DS_Store
