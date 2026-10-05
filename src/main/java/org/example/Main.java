@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 public class Main {
     private static String vfsPath = "";
     private static String script = "";
-    private static ArrayList<String> vfsFiles = new ArrayList();
+    private static ArrayList<String> vfsFiles = new ArrayList<>();
     private static String currentPath = "/";
 
 
@@ -27,13 +27,14 @@ public class Main {
 
         try {
             host = InetAddress.getLocalHost().getHostName();
-        } catch (Exception var4) {
+        } catch (Exception exception) {
+            host = "unknown";
         }
 
         String title = "Эмулятор - [" + user + "@" + host + "]";
         JFrame window = new JFrame(title);
         window.setSize(500, 600);
-        window.setDefaultCloseOperation(3);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
         return window;
     }
@@ -60,11 +61,61 @@ public class Main {
     }
 
     public static void ls(ArrayList<String> tokens, JTextArea textArea) {
-        textArea.append("Выполнена команда ls. Аргументы " + tokens.toString() + "\n");
+        String lookupPath = currentPath;
+        if (!tokens.isEmpty()) {
+            String target = (String)tokens.get(0);
+            if (target.startsWith("/")) {
+                lookupPath = target;
+            } else {
+                lookupPath = currentPath.equals("/") ? "/" + target : currentPath + "/" + target;
+            }
+        }
+
+        textArea.append("Содержимое папки " + lookupPath + ":\n");
+        boolean hasFiles = false;
+        String prefix = lookupPath.equals("/") ? "/" : lookupPath + "/";
+
+        for(String path : vfsFiles) {
+            if (path.startsWith(prefix)) {
+                String remainder = path.substring(prefix.length());
+                if (!remainder.contains("/")) {
+                    textArea.append("  " + remainder + "\n");
+                    hasFiles = true;
+                }
+            }
+        }
+
+        if (!hasFiles) {
+            textArea.append("  [Папка пуста]\n");
+        }
     }
 
     public static void cd(ArrayList<String> tokens, JTextArea textArea) {
-        textArea.append("Выполнена команда cd. Аргументы " + tokens.toString() + "\n");
+        if (tokens.isEmpty()) {
+            currentPath = "/";
+            textArea.append("Совершен переход в корневую директорию" + "\n");
+        } else {
+            String target = (String)tokens.get(0);
+            if (target.equals("/")) {
+                currentPath = "/";
+            } else {
+                String destinationPath;
+                if (target.startsWith("/")) {
+                    destinationPath = target;
+                } else {
+                    destinationPath = currentPath.equals("/") ? "/" + target : currentPath + "/" + target;
+                }
+
+                if (vfsFiles.contains(destinationPath)) {
+                    currentPath = destinationPath;
+                    textArea.append("Вы перешли в папку " + destinationPath + "\n");
+                } else {
+                    textArea.append("Ошибка: папка '" + target + "' не найдена в VFS.\n");
+                }
+
+            }
+        }
+
     }
 
     public ArrayList<String> cdParser(String input) {
@@ -127,7 +178,8 @@ public class Main {
                     }
 
                     fileScanner.close();
-                } catch (Exception var7) {
+                } catch (Exception exception) {
+                    textArea.append("[Ошибка VFS] Не удалось прочитать стартовый скрипт:\n");
                 }
             } else {
                 String[] commands = script.split(";");
@@ -140,18 +192,35 @@ public class Main {
                 }
             }
         }
-
     }
 
+    private static void scanDirectory(File root, String virtualPrefix) {
+        File[] list = root.listFiles();
+        if (list != null) {
+            for(File f : list) {
+                String vPath = virtualPrefix + (virtualPrefix.equals("/") ? "" : "/") + f.getName();
+                vfsFiles.add(vPath);
+                if (f.isDirectory()) {
+                    scanDirectory(f, vPath);
+                }
+            }
+        }
+    }
 
     public static void main(String[] args) {
-        if (args.length > 0) {
-            vfsPath = args[0];
-        }
+        if (args.length > 0) {vfsPath = args[0];}
+        if (args.length > 1) {script = args[1];}
 
-        if (args.length > 1) {
-            script = args[1];
+        File rootDir;
+        if (!vfsPath.isEmpty()) {
+            rootDir = new File(vfsPath);
+        } else {
+            String currentPathStr = new File(".").getAbsolutePath();
+            String rootPath = currentPathStr.substring(0, currentPathStr.indexOf("JavaTerminalEmulator") + "JavaTerminalEmulator".length());
+            rootDir = new File(rootPath);
         }
+        vfsFiles.add("/");
+        scanDirectory(rootDir, "");
 
         JFrame window = createWindow();
         JTextArea textArea = createTextArea();
@@ -161,13 +230,12 @@ public class Main {
         window.add(inputField, "North");
         window.setVisible(true);
         inputField.addActionListener((e) -> {
-            String vvod = inputField.getText().trim();
-            if (!vvod.isEmpty()) {
-                executeCommand(vvod, textArea);
+            String input = inputField.getText().trim();
+            if (!input.isEmpty()) {
+                executeCommand(input, textArea);
             }
             inputField.setText("");
         });
-
 
         executeStartScript(script, textArea);
     }

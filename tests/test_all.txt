@@ -1,0 +1,13 @@
+ls
+conf-dump
+cd test_deep
+ls
+cd citadel
+ls
+cd
+cd test_files
+ls
+cd
+cd test_minimal
+ls
+cd

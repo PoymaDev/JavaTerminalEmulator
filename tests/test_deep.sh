@@ -1,0 +1,3 @@
+#!/bin/bash
+java -cp "/Users/paymorewoodbridge/Desktop/repoz/Java мирэа/JavaTerminalEmulator/build/classes/java/main" org.example.Main \
+"/Users/paymorewoodbridge/Desktop/repoz/Java мирэа/JavaTerminalEmulator/test_deep/" "ls; cd citadel; ls; cd apple; ls"
