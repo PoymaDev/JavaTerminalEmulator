@@ -12,6 +12,8 @@
 .settings/
 .classpath
 .project
+.gradle/
+build/
 
 # Системные файлы Mac
 .DS_Store
