@@ -179,7 +179,7 @@ public class Main {
 
                     fileScanner.close();
                 } catch (Exception exception) {
-                    textArea.append("[Ошибка VFS] Не удалось прочитать стартовый скрипт:\n");
+                    textArea.append("[Ошибка VFS] Не удалось прочитать скрипт:\n");
                 }
             } else {
                 String[] commands = script.split(";");
