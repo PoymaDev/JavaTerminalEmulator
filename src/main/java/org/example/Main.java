@@ -60,7 +60,8 @@ public class Main {
         System.exit(0);
     }
 
-    public static void ls(ArrayList<String> tokens, JTextArea textArea) {
+    public static void ls(ArrayList<String> tokens,
+                          JTextArea textArea) {
         String lookupPath = currentPath;
         if (!tokens.isEmpty()) {
             String target = (String)tokens.get(0);
@@ -72,7 +73,8 @@ public class Main {
             }
         }
 
-        textArea.append("Содержимое папки " + lookupPath + ":\n");
+        textArea.append("Содержимое папки "
+                + lookupPath + ":\n");
         boolean hasFiles = false;
         String prefix = lookupPath.equals("/") ?
                 "/" : lookupPath + "/";
@@ -112,14 +114,21 @@ public class Main {
                 if (target.startsWith("/")) {
                     destinationPath = target;
                 } else {
-                    destinationPath = currentPath.equals("/") ? "/" + target : currentPath + "/" + target;
+                    destinationPath = currentPath.equals("/") ?
+                            "/" +
+                                    target :
+                            currentPath + "/"
+                                    + target;
                 }
 
                 if (vfsFiles.contains(destinationPath)) {
                     currentPath = destinationPath;
-                    textArea.append("Вы перешли в папку " + destinationPath + "\n");
+                    textArea.append("Вы перешли в папку "
+                            + destinationPath + "\n");
                 } else {
-                    textArea.append("Ошибка: папка '" + target + "' не найдена в VFS.\n");
+                    textArea.append("Ошибка: папка '"
+                            + target +
+                            "' не найдена в VFS.\n");
                 }
 
             }
