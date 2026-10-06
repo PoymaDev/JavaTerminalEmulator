@@ -67,33 +67,42 @@ public class Main {
             if (target.startsWith("/")) {
                 lookupPath = target;
             } else {
-                lookupPath = currentPath.equals("/") ? "/" + target : currentPath + "/" + target;
+                lookupPath = currentPath.equals("/") ? "/" +
+                        target : currentPath + "/" + target;
             }
         }
 
         textArea.append("Содержимое папки " + lookupPath + ":\n");
         boolean hasFiles = false;
-        String prefix = lookupPath.equals("/") ? "/" : lookupPath + "/";
+        String prefix = lookupPath.equals("/") ?
+                "/" : lookupPath + "/";
 
         for(String path : vfsFiles) {
             if (path.startsWith(prefix)) {
-                String remainder = path.substring(prefix.length());
+                String remainder =
+                        path.substring(prefix.length());
                 if (!remainder.contains("/")) {
-                    textArea.append("  " + remainder + "\n");
+                    textArea.append("  " +
+                            remainder + "\n");
                     hasFiles = true;
                 }
             }
         }
 
         if (!hasFiles) {
-            textArea.append("  [Папка пуста]\n");
+            textArea
+                    .append("  [Папка пуста]\n");
         }
     }
 
-    public static void cd(ArrayList<String> tokens, JTextArea textArea) {
+    public static void cd(ArrayList<String> tokens,
+                          JTextArea textArea) {
         if (tokens.isEmpty()) {
             currentPath = "/";
-            textArea.append("Совершен переход в корневую директорию" + "\n");
+            textArea.
+                    append
+                            ("Совершен переход в корневую директорию"
+                                    + "\n");
         } else {
             String target = (String)tokens.get(0);
             if (target.equals("/")) {
@@ -120,7 +129,9 @@ public class Main {
 
     public ArrayList<String> cdParser(String input) {
         ArrayList<String> tokens = new ArrayList();
-        Matcher matcher = Pattern.compile("\"([^\"]*)\"|(\\S+)").matcher(input);
+        Matcher matcher = Pattern.
+                compile("\"([^\"]*)\"|(\\S+)")
+                        .matcher(input);
 
         while(matcher.find()) {
             if (matcher.group(1) != null) {
@@ -134,8 +145,10 @@ public class Main {
     }
 
 
-    private static void executeCommand(String input, JTextArea textArea) {
-        ArrayList<String> tokens = (new Main()).cdParser(input);
+    private static void executeCommand(String input,
+                                       JTextArea textArea) {
+        ArrayList<String> tokens = (new Main())
+                .cdParser(input);
         if (tokens.isEmpty()) {
             textArea.append("$ \n");
         } else {
@@ -171,15 +184,22 @@ public class Main {
                     Scanner fileScanner = new Scanner(file);
 
                     while(fileScanner.hasNextLine()) {
-                        String cmd = fileScanner.nextLine().trim();
-                        if (!cmd.isEmpty() && !cmd.startsWith("//")) {
+                        String cmd = fileScanner
+                                .nextLine()
+                                .trim();
+                        if (!cmd.isEmpty()
+                                &&
+                                !cmd.startsWith("//")) {
                             executeCommand(cmd, textArea);
                         }
                     }
 
                     fileScanner.close();
                 } catch (Exception exception) {
-                    textArea.append("[Ошибка VFS] Не удалось прочитать скрипт:\n");
+                    textArea
+                            .append
+                                    ("[Ошибка VFS] Не удалось " +
+                                            "прочитать скрипт:\n");
                 }
             } else {
                 String[] commands = script.split(";");
@@ -194,11 +214,15 @@ public class Main {
         }
     }
 
-    private static void scanDirectory(File root, String virtualPrefix) {
+    private static void scanDirectory(File root,
+                                      String virtualPrefix) {
         File[] list = root.listFiles();
         if (list != null) {
             for(File f : list) {
-                String vPath = virtualPrefix + (virtualPrefix.equals("/") ? "" : "/") + f.getName();
+                String vPath = virtualPrefix +
+                        (virtualPrefix.equals("/") ?
+                                "" : "/") +
+                        f.getName();
                 vfsFiles.add(vPath);
                 if (f.isDirectory()) {
                     scanDirectory(f, vPath);
@@ -216,7 +240,10 @@ public class Main {
             rootDir = new File(vfsPath);
         } else {
             String currentPathStr = new File(".").getAbsolutePath();
-            String rootPath = currentPathStr.substring(0, currentPathStr.indexOf("JavaTerminalEmulator") + "JavaTerminalEmulator".length());
+            String rootPath = currentPathStr
+                    .substring
+                            (0, currentPathStr.indexOf("JavaTerminalEmulator")
+                            + "JavaTerminalEmulator".length());
             rootDir = new File(rootPath);
         }
         vfsFiles.add("/");
